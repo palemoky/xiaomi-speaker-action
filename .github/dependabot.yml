@@ -1,0 +1,37 @@
+version: 2
+updates:
+  # 监控 GitHub Actions 版本更新
+  - package-ecosystem: 'github-actions'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+      day: 'monday'
+      time: '09:00'
+      timezone: 'Asia/Shanghai'
+    open-pull-requests-limit: 10
+    labels:
+      - 'dependencies'
+      - 'github-actions'
+    commit-message:
+      prefix: 'chore'
+      include: 'scope'
+    reviewers:
+      - 'palemoky'
+
+  # 监控 npm 依赖版本更新
+  - package-ecosystem: 'npm'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+      day: 'monday'
+      time: '09:00'
+      timezone: 'Asia/Shanghai'
+    open-pull-requests-limit: 10
+    labels:
+      - 'dependencies'
+      - 'npm'
+    commit-message:
+      prefix: 'chore'
+      include: 'scope'
+    reviewers:
+      - 'palemoky'

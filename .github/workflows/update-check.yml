@@ -1,0 +1,43 @@
+name: Check for Updates
+
+on:
+  schedule:
+    # 每周一早上 9 点检查
+    - cron: '0 1 * * 1' # UTC 1:00 = 北京时间 9:00
+  workflow_dispatch: # 允许手动触发
+
+jobs:
+  check-updates:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Check for outdated dependencies
+        run: |
+          echo "## 📦 Dependency Update Check" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # 检查 npm 依赖
+          echo "### npm Dependencies" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          bun outdated || echo "All dependencies are up to date!" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+      - name: Check GitHub Actions versions
+        run: |
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### GitHub Actions" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # 提取所有使用的 actions
+          echo "Current actions in use:" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          grep -r "uses:" .github/workflows/ | grep -v "^#" | sed 's/.*uses: //' | sort -u >> $GITHUB_STEP_SUMMARY || true
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "> 💡 Dependabot will automatically create PRs for updates" >> $GITHUB_STEP_SUMMARY

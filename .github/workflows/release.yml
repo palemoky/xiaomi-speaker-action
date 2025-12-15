@@ -1,0 +1,70 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Type check
+        run: bun run typecheck
+
+      - name: Run tests
+        run: bun test
+
+      - name: Build
+        run: bun run build
+
+      - name: Verify build
+        run: |
+          if [ ! -f "dist/index.js" ]; then
+            echo "Error: dist/index.js not found"
+            exit 1
+          fi
+          echo "✅ Build successful"
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Commit dist
+        run: |
+          git add dist/
+          git diff --staged --quiet || git commit -m "chore: update dist for ${{ github.ref_name }}"
+
+      - name: Push changes
+        run: |
+          git push origin HEAD:main || echo "No changes to push"
+
+      - name: Update major version tag
+        run: |
+          TAG=${{ github.ref_name }}
+          MAJOR_VERSION=$(echo $TAG | cut -d. -f1)
+          git tag -f $MAJOR_VERSION
+          git push -f origin $MAJOR_VERSION
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          generate_release_notes: true
+          files: |
+            dist/index.js
