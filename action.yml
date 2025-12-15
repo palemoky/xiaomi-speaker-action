@@ -10,42 +10,42 @@ inputs:
   webhook_url:
     description: 'Xiaomi Speaker webhook URL'
     required: true
-  
+
   api_secret:
     description: 'API secret for authentication (X-API-Key header)'
     required: false
-  
+
   message:
     description: 'Default message to send (used when success_message and failure_message are not set)'
     required: false
-  
+
   success_message:
     description: 'Message to send on workflow success'
     required: false
-  
+
   failure_message:
     description: 'Message to send on workflow failure'
     required: false
-  
+
   job_status:
     description: 'Current job status (success/failure/cancelled). Auto-detected if not provided'
     required: false
     default: ${{ job.status }}
-  
+
   custom_payload:
     description: 'Custom JSON payload (will be placed in "custom" field)'
     required: false
-  
+
   timeout:
     description: 'Request timeout in milliseconds'
     required: false
     default: '10000'
-  
+
   max_retries:
     description: 'Maximum number of retry attempts on failure'
     required: false
     default: '2'
-  
+
   include_owner:
     description: 'Include repository owner in metadata (default: false, only repo name)'
     required: false
@@ -54,10 +54,10 @@ inputs:
 outputs:
   status:
     description: 'Request status (success/failed)'
-  
+
   response:
     description: 'API response body (JSON string)'
-  
+
   message_sent:
     description: 'The actual message that was sent'
 

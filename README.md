@@ -232,6 +232,9 @@ Check the `status` output to determine if the notification was successful:
 # Install dependencies
 bun install
 
+# Install pre-commit hooks (recommended)
+make hooks
+
 # Type check
 bun run typecheck
 
@@ -244,6 +247,30 @@ bun run build
 # Format code
 bun run format
 ```
+
+### Pre-commit Hooks
+
+This project uses [pre-commit](https://pre-commit.com/) to ensure code quality:
+
+**On commit:**
+
+- Auto-format code with Prettier
+- Run TypeScript type checking
+- Check file syntax and common issues
+
+**On push:**
+
+- Run all tests
+- Verify build succeeds
+- Check dist/ is up-to-date
+
+Install hooks:
+
+```bash
+make hooks
+```
+
+See [docs/PRE_COMMIT.md](docs/PRE_COMMIT.md) for details.
 
 ## 📄 License
 

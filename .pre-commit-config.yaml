@@ -1,0 +1,88 @@
+# Pre-commit hooks configuration
+# See https://pre-commit.com for more information
+
+repos:
+  # 通用文件检查
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      # 防止提交大文件
+      - id: check-added-large-files
+        args: ['--maxkb=500']
+
+      # 检查合并冲突标记
+      - id: check-merge-conflict
+
+      # 检查 YAML 语法
+      - id: check-yaml
+        args: ['--unsafe'] # 允许自定义 YAML 标签
+
+      # 检查 JSON 语法
+      - id: check-json
+
+      # 检查是否有未解决的合并冲突
+      - id: detect-private-key
+
+      # 文件末尾添加空行
+      - id: end-of-file-fixer
+
+      # 移除行尾空格
+      - id: trailing-whitespace
+        args: ['--markdown-linebreak-ext=md']
+
+      # 检查文件名大小写冲突
+      - id: check-case-conflict
+
+      # 确保文件以换行符结尾
+      - id: mixed-line-ending
+        args: ['--fix=lf']
+
+  # Prettier 代码格式化
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: v3.1.0
+    hooks:
+      - id: prettier
+        types_or: [javascript, jsx, ts, tsx, json, yaml, markdown]
+        additional_dependencies:
+          - prettier@3.1.0
+
+  # TypeScript 类型检查（本地）
+  - repo: local
+    hooks:
+      - id: typecheck
+        name: TypeScript Type Check
+        entry: bun run typecheck
+        language: system
+        types: [ts]
+        pass_filenames: false
+        stages: [pre-commit]
+
+      # 运行测试
+      - id: test
+        name: Run Tests
+        entry: bun test
+        language: system
+        types: [ts]
+        pass_filenames: false
+        stages: [pre-push]
+
+      # 构建检查
+      - id: build
+        name: Build Check
+        entry: bun run build
+        language: system
+        types: [ts]
+        pass_filenames: false
+        stages: [pre-push]
+
+      # 检查 dist 是否已更新
+      - id: check-dist
+        name: Check dist is up-to-date
+        entry: bash -c 'git diff --exit-code dist/ || (echo "❌ dist/ is not up-to-date. Run make build" && exit 1)'
+        language: system
+        pass_filenames: false
+        stages: [pre-push]
+
+# 全局配置
+default_stages: [pre-commit]
+fail_fast: false

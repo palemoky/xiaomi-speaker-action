@@ -56,11 +56,11 @@ export async function sendNotification(
         }
 
         const result = (await response.json()) as ApiResponse;
-        
+
         if (attempt > 0) {
           core.info(`✅ Request succeeded on retry attempt ${attempt}`);
         }
-        
+
         return result;
       } catch (error) {
         clearTimeout(timeoutId);
@@ -73,7 +73,7 @@ export async function sendNotification(
       }
     } catch (error) {
       lastError = error instanceof Error ? error : new Error(String(error));
-      
+
       // Don't log error on last attempt (will be handled by caller)
       if (attempt < config.maxRetries) {
         core.warning(`Attempt ${attempt + 1} failed: ${lastError.message}`);

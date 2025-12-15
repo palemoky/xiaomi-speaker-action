@@ -64,12 +64,10 @@ describe('sendNotification', () => {
     };
 
     // First call fails, second succeeds
-    mockFetch
-      .mockRejectedValueOnce(new Error('Network error'))
-      .mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockResponse,
-      });
+    mockFetch.mockRejectedValueOnce(new Error('Network error')).mockResolvedValueOnce({
+      ok: true,
+      json: async () => mockResponse,
+    });
 
     const result = await sendNotification(testUrl, testPayload, undefined, {
       maxRetries: 2,

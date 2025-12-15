@@ -1,4 +1,4 @@
-.PHONY: help install dev build test test-watch typecheck format format-check lint clean dist-clean all
+.PHONY: help install dev build test test-watch typecheck format format-check lint clean dist-clean all hooks
 
 # 默认目标：显示帮助信息
 help:
@@ -18,6 +18,10 @@ help:
 	@echo "  make format        - 格式化代码"
 	@echo "  make format-check  - 检查代码格式"
 	@echo "  make lint          - 代码检查（格式+类型）"
+	@echo ""
+	@echo "Git Hooks:"
+	@echo "  make hooks         - 安装 pre-commit hooks"
+	@echo "  make hooks-update  - 更新 pre-commit hooks"
 	@echo ""
 	@echo "清理命令:"
 	@echo "  make clean         - 清理构建产物"
@@ -71,6 +75,37 @@ format-check:
 # 代码检查（格式+类型）
 lint: format-check typecheck
 	@echo "✅ 代码检查通过"
+
+# 安装 pre-commit hooks
+hooks:
+	@echo "🪝 安装 pre-commit hooks..."
+	@command -v pre-commit >/dev/null 2>&1 || { \
+		echo "❌ pre-commit 未安装"; \
+		echo ""; \
+		echo "安装方法:"; \
+		echo "  brew install pre-commit"; \
+		echo "  或"; \
+		echo "  pip install pre-commit"; \
+		exit 1; \
+	}
+	pre-commit install
+	pre-commit install --hook-type pre-push
+	@echo "✅ Git hooks 安装完成"
+	@echo ""
+	@echo "现在会在以下时机自动运行检查:"
+	@echo "  • commit 前: 格式化代码 + 类型检查"
+	@echo "  • push 前: 运行测试 + 构建检查"
+
+# 更新 pre-commit hooks
+hooks-update:
+	@echo "🔄 更新 pre-commit hooks..."
+	pre-commit autoupdate
+	@echo "✅ Hooks 更新完成"
+
+# 手动运行所有 hooks
+hooks-run:
+	@echo "🪝 运行所有 pre-commit hooks..."
+	pre-commit run --all-files
 
 # 清理构建产物
 clean:
