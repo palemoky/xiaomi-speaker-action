@@ -4,14 +4,16 @@
 repos:
   # 通用文件检查
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
+    rev: v6.0.0
     hooks:
       # 防止提交大文件
       - id: check-added-large-files
         args: ['--maxkb=500']
+        exclude: ^dist/
 
       # 检查合并冲突标记
       - id: check-merge-conflict
+        exclude: ^dist/
 
       # 检查 YAML 语法
       - id: check-yaml
@@ -19,16 +21,20 @@ repos:
 
       # 检查 JSON 语法
       - id: check-json
+        exclude: ^dist/
 
       # 检查是否有未解决的合并冲突
       - id: detect-private-key
+        exclude: ^dist/
 
       # 文件末尾添加空行
       - id: end-of-file-fixer
+        exclude: ^dist/
 
       # 移除行尾空格
       - id: trailing-whitespace
         args: ['--markdown-linebreak-ext=md']
+        exclude: ^dist/
 
       # 检查文件名大小写冲突
       - id: check-case-conflict
@@ -36,15 +42,17 @@ repos:
       # 确保文件以换行符结尾
       - id: mixed-line-ending
         args: ['--fix=lf']
+        exclude: ^dist/
 
   # Prettier 代码格式化
-  - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: v3.1.0
+  - repo: local
     hooks:
       - id: prettier
+        name: Prettier
+        entry: bun run prettier --write --ignore-unknown
+        language: system
         types_or: [javascript, jsx, ts, tsx, json, yaml, markdown]
-        additional_dependencies:
-          - prettier@3.1.0
+        exclude: ^dist/
 
   # TypeScript 类型检查（本地）
   - repo: local
@@ -83,6 +91,52 @@ repos:
         pass_filenames: false
         stages: [pre-push]
 
+      # 检测 TODO/FIXME
+      - id: no-todos
+        name: Detect TODO/FIXME
+        entry: bash -c 'grep -rn "TODO\|FIXME" src/ && echo "❌ Found TODO/FIXME in code. Please resolve before committing." && exit 1 || exit 0'
+        language: system
+        pass_filenames: false
+        stages: [pre-commit]
+
+      # 检测调试代码
+      - id: no-debug-code
+        name: Detect Debug Code
+        entry: bash -c 'grep -rn "console\.log\|debugger" src/ && echo "❌ Found console.log or debugger in code. Please remove before committing." && exit 1 || exit 0'
+        language: system
+        pass_filenames: false
+        stages: [pre-commit]
+
+  # Commit 消息规范检查
+  - repo: https://github.com/compilerla/conventional-pre-commit
+    rev: v4.3.0
+    hooks:
+      - id: conventional-pre-commit
+        stages: [commit-msg]
+        args:
+          - feat
+          - fix
+          - docs
+          - style
+          - refactor
+          - perf
+          - test
+          - build
+          - ci
+          - chore
+          - revert
+
+  # 依赖安全扫描
+  - repo: local
+    hooks:
+      - id: audit-dependencies
+        name: Audit Dependencies
+        entry: bash -c 'bun pm audit || echo "⚠️ Found vulnerabilities in dependencies"'
+        language: system
+        pass_filenames: false
+        stages: [pre-push]
+
 # 全局配置
 default_stages: [pre-commit]
 fail_fast: false
+exclude: ^dist/
