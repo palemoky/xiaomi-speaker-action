@@ -1,0 +1,36 @@
+name: Test Action
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Test Success Notification
+        uses: palemoky/xiaomi-speaker-action@dev
+        with:
+          webhook_url: ${{ secrets.SPEAKER_WEBHOOK_URL }}
+          api_secret: ${{ secrets.SPEAKER_API_SECRET }}
+          cf_client_id: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+          cf_client_secret: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+          success_message: '✅ Congratulations! The action is working!'
+          failure_message: '❌ Mayday! Mayday! Something went wrong. Please check.'
+
+      - name: Simulate Failure
+        run: exit 1
+        continue-on-error: true
+        id: fail_step
+
+      - name: Test Failure Notification
+        if: always()
+        uses: palemoky/xiaomi-speaker-action@dev
+        with:
+          webhook_url: ${{ secrets.SPEAKER_WEBHOOK_URL }}
+          api_secret: ${{ secrets.SPEAKER_API_SECRET }}
+          cf_client_id: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+          cf_client_secret: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+          message: 'Oh no! Test failed.'
+          job_status: ${{ steps.fail_step.outcome }}

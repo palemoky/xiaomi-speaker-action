@@ -26,7 +26,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Build
         run: npm run build
@@ -35,7 +35,7 @@ jobs:
         if: always()
         uses: palemoky/xiaomi-speaker-action@v1
         with:
-          webhook_url: ${{ secrets.XIAOMI_WEBHOOK_URL }}
+          webhook_url: ${{ secrets.SPEAKER_WEBHOOK_URL }}
           api_secret: ${{ secrets.XIAOMI_API_SECRET }}
           success_message: '✅ Build succeeded for ${{ github.repository }}'
           failure_message: '❌ Build failed for ${{ github.repository }}'
@@ -43,18 +43,20 @@ jobs:
 
 ## 📋 Inputs
 
-| Input             | Required | Default             | Description                       |
-| ----------------- | -------- | ------------------- | --------------------------------- |
-| `webhook_url`     | ✅       | -                   | Xiaomi Speaker webhook URL        |
-| `api_secret`      | ❌       | -                   | API secret for authentication     |
-| `message`         | ❌       | -                   | Default message (fallback)        |
-| `success_message` | ❌       | -                   | Message for successful jobs       |
-| `failure_message` | ❌       | -                   | Message for failed/cancelled jobs |
-| `job_status`      | ❌       | `${{ job.status }}` | Job status (auto-detected)        |
-| `custom_payload`  | ❌       | -                   | Custom JSON payload               |
-| `timeout`         | ❌       | `10000`             | Request timeout (ms)              |
-| `max_retries`     | ❌       | `2`                 | Maximum retry attempts            |
-| `include_owner`   | ❌       | `false`             | Include repo owner in metadata    |
+| Input              | Required | Default             | Description                       |
+| ------------------ | -------- | ------------------- | --------------------------------- |
+| `webhook_url`      | ✅       | -                   | Xiaomi Speaker webhook URL        |
+| `api_secret`       | ❌       | -                   | API secret for authentication     |
+| `cf_client_id`     | ❌       | -                   | Cloudflare Access Client ID       |
+| `cf_client_secret` | ❌       | -                   | Cloudflare Access Client Secret   |
+| `message`          | ❌       | -                   | Default message (fallback)        |
+| `success_message`  | ❌       | -                   | Message for successful jobs       |
+| `failure_message`  | ❌       | -                   | Message for failed/cancelled jobs |
+| `job_status`       | ❌       | `${{ job.status }}` | Job status (auto-detected)        |
+| `custom_payload`   | ❌       | -                   | Custom JSON payload               |
+| `timeout`          | ❌       | `10000`             | Request timeout (ms)              |
+| `max_retries`      | ❌       | `2`                 | Maximum retry attempts            |
+| `include_owner`    | ❌       | `false`             | Include repo owner in metadata    |
 
 ## 📤 Outputs
 
@@ -73,9 +75,9 @@ jobs:
   if: always()
   uses: palemoky/xiaomi-speaker-action@v1
   with:
-    webhook_url: ${{ secrets.XIAOMI_WEBHOOK_URL }}
-    success_message: '部署成功'
-    failure_message: '部署失败，请检查'
+    webhook_url: ${{ secrets.SPEAKER_WEBHOOK_URL }}
+    success_message: 'Ship it! The code is live.'
+    failure_message: 'Mayday! Mayday! Something went wrong. Please check.'
 ```
 
 ### Only Notify on Failure
@@ -85,8 +87,8 @@ jobs:
   if: failure()
   uses: palemoky/xiaomi-speaker-action@v1
   with:
-    webhook_url: ${{ secrets.XIAOMI_WEBHOOK_URL }}
-    message: '构建失败：${{ github.repository }}'
+    webhook_url: ${{ secrets.SPEAKER_WEBHOOK_URL }}
+    message: 'Mayday! Mayday! ${{ github.repository }} failed.'
 ```
 
 ### With Custom Payload
@@ -95,8 +97,8 @@ jobs:
 - name: Notify with Metadata
   uses: palemoky/xiaomi-speaker-action@v1
   with:
-    webhook_url: ${{ secrets.XIAOMI_WEBHOOK_URL }}
-    message: '部署完成'
+    webhook_url: ${{ secrets.SPEAKER_WEBHOOK_URL }}
+    message: 'Ship it! The code is live.'
     custom_payload: |
       {
         "environment": "production",
@@ -119,9 +121,9 @@ jobs:
         if: always()
         uses: palemoky/xiaomi-speaker-action@v1
         with:
-          webhook_url: ${{ secrets.XIAOMI_WEBHOOK_URL }}
-          success_message: '测试通过'
-          failure_message: '测试失败'
+          webhook_url: ${{ secrets.SPEAKER_WEBHOOK_URL }}
+          success_message: 'Ship it! The code is live.'
+          failure_message: 'Mayday! Mayday! Something went wrong. Please check.'
 
   deploy:
     needs: test
@@ -134,9 +136,9 @@ jobs:
         if: always()
         uses: palemoky/xiaomi-speaker-action@v1
         with:
-          webhook_url: ${{ secrets.XIAOMI_WEBHOOK_URL }}
-          success_message: '部署成功到生产环境'
-          failure_message: '部署失败，请立即检查'
+          webhook_url: ${{ secrets.SPEAKER_WEBHOOK_URL }}
+          success_message: 'Ship it! The code is live.'
+          failure_message: 'Mayday! Mayday! Something went wrong. Please check.'
 ```
 
 ### With Retry Configuration
@@ -145,10 +147,23 @@ jobs:
 - name: Notify with Custom Retry
   uses: palemoky/xiaomi-speaker-action@v1
   with:
-    webhook_url: ${{ secrets.XIAOMI_WEBHOOK_URL }}
+    webhook_url: ${{ secrets.SPEAKER_WEBHOOK_URL }}
     message: '重要通知'
     max_retries: 3
     timeout: 15000
+```
+
+### With Cloudflare Access Authentication
+
+```yaml
+- name: Notify with CF Access
+  uses: palemoky/xiaomi-speaker-action@v1
+  with:
+    webhook_url: ${{ secrets.SPEAKER_WEBHOOK_URL }}
+    cf_client_id: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+    cf_client_secret: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+    success_message: 'Ship it! The code is live.'
+    failure_message: 'Mayday! Mayday! Something went wrong. Please check.'
 ```
 
 ## 🔧 Setup
@@ -171,8 +186,15 @@ docker run -d \
 
 Add these secrets to your repository (Settings → Secrets → Actions):
 
-- `XIAOMI_WEBHOOK_URL`: Your webhook URL (e.g., `https://your-domain.com`)
-- `XIAOMI_API_SECRET`: Your API secret (optional but recommended)
+**Required:**
+
+- `SPEAKER_WEBHOOK_URL`: Your webhook URL (e.g., `https://your-domain.com`)
+
+**Optional (for authentication):**
+
+- `XIAOMI_API_SECRET`: Your API secret
+- `CF_ACCESS_CLIENT_ID`: Cloudflare Access Client ID (if using CF Access)
+- `CF_ACCESS_CLIENT_SECRET`: Cloudflare Access Client Secret (if using CF Access)
 
 ### 3. Use in Workflow
 
@@ -219,7 +241,7 @@ Check the `status` output to determine if the notification was successful:
   id: notify
   uses: palemoky/xiaomi-speaker-action@v1
   with:
-    webhook_url: ${{ secrets.XIAOMI_WEBHOOK_URL }}
+    webhook_url: ${{ secrets.SPEAKER_WEBHOOK_URL }}
     message: "Test"
 
 - name: Check Status
