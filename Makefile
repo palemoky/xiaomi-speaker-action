@@ -198,10 +198,17 @@ release:  ## Create and push version tag (Usage: make release v1.0.0)
 	git push origin $$VERSION; \
 	MAJOR_VERSION=$$(echo $$VERSION | cut -d. -f1); \
 	echo "$(BLUE)Updating major version tag $$MAJOR_VERSION...$(NC)"; \
-	git tag -fa $$MAJOR_VERSION -m "Update $$MAJOR_VERSION to $$VERSION"; \
-	git push origin $$MAJOR_VERSION --force; \
-	echo "$(GREEN)✓ Release $$VERSION completed$(NC)"; \
-	echo "$(GREEN)✓ Major version tag $$MAJOR_VERSION updated$(NC)"
+	git tag -d $$MAJOR_VERSION 2>/dev/null || true; \
+	if git ls-remote --tags origin | grep -q "refs/tags/$$MAJOR_VERSION$$"; then \
+		git tag -fa $$MAJOR_VERSION -m "Update $$MAJOR_VERSION to $$VERSION"; \
+		git push origin $$MAJOR_VERSION --force; \
+		echo "$(GREEN)✓ Major version tag $$MAJOR_VERSION updated to $$VERSION$(NC)"; \
+	else \
+		git tag -a $$MAJOR_VERSION -m "Create $$MAJOR_VERSION at $$VERSION"; \
+		git push origin $$MAJOR_VERSION; \
+		echo "$(GREEN)✓ Major version tag $$MAJOR_VERSION created$(NC)"; \
+	fi; \
+	echo "$(GREEN)✓ Release $$VERSION completed$(NC)"
 
 # Allow version number as target
 v%:
