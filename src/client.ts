@@ -6,7 +6,7 @@ import { sleep, getRetryDelay } from './utils';
  * Authentication configuration
  */
 export interface AuthConfig {
-  apiSecret?: string;
+  apiSecret: string;
   cfAccessClientId?: string;
   cfAccessClientSecret?: string;
 }
@@ -25,12 +25,8 @@ export async function sendNotification(
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     'User-Agent': 'xiaomi-speaker-action/1.0',
+    'Speaker-API-Secret': auth.apiSecret,
   };
-
-  // Add API secret if provided
-  if (auth.apiSecret) {
-    headers['Speaker-API-Secret'] = auth.apiSecret;
-  }
 
   // Add Cloudflare Access headers if provided
   if (auth.cfAccessClientId) {

@@ -9,7 +9,7 @@ async function run(): Promise<void> {
     // 1. Read input parameters
     const inputs: ActionInputs = {
       webhook_url: core.getInput('webhook_url', { required: true }),
-      api_secret: core.getInput('api_secret') || undefined,
+      api_secret: core.getInput('api_secret', { required: true }),
       cf_client_id: core.getInput('cf_client_id') || undefined,
       cf_client_secret: core.getInput('cf_client_secret') || undefined,
       message: core.getInput('message') || undefined,

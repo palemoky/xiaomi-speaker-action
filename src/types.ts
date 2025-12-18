@@ -3,7 +3,7 @@
  */
 export interface ActionInputs {
   webhook_url: string;
-  api_secret?: string;
+  api_secret: string;
   cf_client_id?: string;
   cf_client_secret?: string;
   message?: string;

@@ -13,7 +13,7 @@ inputs:
 
   api_secret:
     description: 'API secret for authentication (Speaker-API-Secret header)'
-    required: false
+    required: true
 
   cf_client_id:
     description: 'Cloudflare Access Client ID (CF-Access-Client-Id header)'

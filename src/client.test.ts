@@ -35,7 +35,7 @@ describe('sendNotification', () => {
     const result = await sendNotification(
       testUrl,
       testPayload,
-      {},
+      { apiSecret: 'test-secret' },
       {
         maxRetries: 2,
         timeout: 10000,
@@ -72,15 +72,16 @@ describe('sendNotification', () => {
       json: async () => ({ status: 'processed', message: 'Test', notification_sent: true }),
     });
 
-    await sendNotification(
+    const result = await sendNotification(
       testUrl,
       testPayload,
       {
+        apiSecret: 'test-secret',
         cfAccessClientId: 'client-id-123',
         cfAccessClientSecret: 'client-secret-456',
       },
       {
-        maxRetries: 0,
+        maxRetries: 2,
         timeout: 10000,
       }
     );
@@ -106,7 +107,7 @@ describe('sendNotification', () => {
     const result = await sendNotification(
       testUrl,
       testPayload,
-      {},
+      { apiSecret: 'test-secret' },
       {
         maxRetries: 2,
         timeout: 10000,
@@ -124,7 +125,7 @@ describe('sendNotification', () => {
       sendNotification(
         testUrl,
         testPayload,
-        {},
+        { apiSecret: 'test-secret' },
         {
           maxRetries: 2,
           timeout: 10000,
@@ -147,7 +148,7 @@ describe('sendNotification', () => {
       sendNotification(
         testUrl,
         testPayload,
-        {},
+        { apiSecret: 'test-secret' },
         {
           maxRetries: 0,
           timeout: 10000,
@@ -162,12 +163,12 @@ describe('sendNotification', () => {
       json: async () => ({ status: 'processed', message: 'Test', notification_sent: true }),
     });
 
-    await sendNotification(
-      'https://example.com/',
+    const result = await sendNotification(
+      `${testUrl}/`,
       testPayload,
-      {},
+      { apiSecret: 'test-secret' },
       {
-        maxRetries: 0,
+        maxRetries: 2,
         timeout: 10000,
       }
     );

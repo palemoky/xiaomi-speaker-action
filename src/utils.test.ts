@@ -5,6 +5,7 @@ import type { ActionInputs } from './types';
 describe('resolveMessage', () => {
   const baseInputs: ActionInputs = {
     webhook_url: 'https://example.com',
+    api_secret: 'test-secret',
     job_status: 'success',
     timeout: 10000,
     max_retries: 2,
@@ -66,6 +67,7 @@ describe('resolveMessage', () => {
 describe('buildPayload', () => {
   const baseInputs: ActionInputs = {
     webhook_url: 'https://example.com',
+    api_secret: 'test-secret',
     job_status: 'success',
     timeout: 10000,
     max_retries: 2,
