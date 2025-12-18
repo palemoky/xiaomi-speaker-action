@@ -1,146 +1,196 @@
-.PHONY: help install dev build test test-watch typecheck format format-check lint clean dist-clean all hooks
+.PHONY: help install build test clean all hooks release
 
-# 默认目标：显示帮助信息
+BLUE := \033[0;34m
+GREEN := \033[0;32m
+YELLOW := \033[0;33m
+RED := \033[0;31m
+NC := \033[0m # No Color
+
+# Default target: show help information
 help:
-	@echo "📦 Xiaomi Speaker Action - 可用命令"
+	@echo "📦 Xiaomi Speaker Action - Available Commands"
 	@echo ""
-	@echo "开发命令:"
-	@echo "  make install       - 安装依赖"
-	@echo "  make dev           - 开发模式运行"
-	@echo "  make build         - 构建生产版本"
+	@echo "Development Commands:"
+	@echo "  make install       - Install dependencies"
+	@echo "  make dev           - Run in development mode"
+	@echo "  make build         - Build production version"
 	@echo ""
-	@echo "测试命令:"
-	@echo "  make test          - 运行所有测试"
-	@echo "  make test-watch    - 监听模式运行测试"
-	@echo "  make typecheck     - TypeScript 类型检查"
+	@echo "Testing Commands:"
+	@echo "  make test          - Run all tests"
+	@echo "  make test-watch    - Run tests in watch mode"
+	@echo "  make typecheck     - TypeScript type checking"
 	@echo ""
-	@echo "代码质量:"
-	@echo "  make format        - 格式化代码"
-	@echo "  make format-check  - 检查代码格式"
-	@echo "  make lint          - 代码检查（格式+类型）"
+	@echo "Code Quality:"
+	@echo "  make format        - Format code"
+	@echo "  make format-check  - Check code formatting"
+	@echo "  make lint          - Lint code (format + types)"
 	@echo ""
 	@echo "Git Hooks:"
-	@echo "  make hooks         - 安装 pre-commit hooks"
-	@echo "  make hooks-update  - 更新 pre-commit hooks"
+	@echo "  make hooks         - Install pre-commit hooks"
+	@echo "  make hooks-update  - Update pre-commit hooks"
 	@echo ""
-	@echo "清理命令:"
-	@echo "  make clean         - 清理构建产物"
-	@echo "  make dist-clean    - 深度清理（包括依赖）"
+	@echo "Cleanup Commands:"
+	@echo "  make clean         - Clean build artifacts"
+	@echo "  make dist-clean    - Deep clean (including dependencies)"
 	@echo ""
-	@echo "快捷命令:"
-	@echo "  make all           - 完整流程（安装+检查+测试+构建）"
+	@echo "Shortcuts:"
+	@echo "  make all           - Full workflow (install + check + test + build)"
 	@echo ""
 
-# 安装依赖
+# Install dependencies
 install:
-	@echo "📥 安装依赖..."
+	@echo "📥 Installing dependencies..."
 	bun install
 
-# 开发模式
+# Development mode
 dev:
-	@echo "🚀 开发模式运行..."
+	@echo "🚀 Running in development mode..."
 	bun run dev
 
-# 构建
+# Build
 build:
-	@echo "🔨 构建生产版本..."
+	@echo "🔨 Building production version..."
 	bun run build
-	@echo "✅ 构建完成: dist/index.js"
+	@echo "✅ Build complete: dist/index.js"
 
-# 运行测试
+# Run tests
 test:
-	@echo "🧪 运行测试..."
+	@echo "🧪 Running tests..."
 	bun test
 
-# 监听模式测试
+# Watch mode tests
 test-watch:
-	@echo "👀 监听模式运行测试..."
+	@echo "👀 Running tests in watch mode..."
 	bun test --watch
 
-# 类型检查
+# Type checking
 typecheck:
-	@echo "🔍 TypeScript 类型检查..."
+	@echo "🔍 TypeScript type checking..."
 	bun run typecheck
 
-# 格式化代码
+# Format code
 format:
-	@echo "✨ 格式化代码..."
+	@echo "✨ Formatting code..."
 	bun run format
 
-# 检查代码格式
+# Check code formatting
 format-check:
-	@echo "🔍 检查代码格式..."
+	@echo "🔍 Checking code formatting..."
 	bun run format:check
 
-# 代码检查（格式+类型）
+# Lint code (format + types)
 lint: format-check typecheck
-	@echo "✅ 代码检查通过"
+	@echo "✅ Code checks passed"
 
-# 安装 pre-commit hooks
+# Install pre-commit hooks
 hooks:
-	@echo "🪝 安装 pre-commit hooks..."
+	@echo "🪝 Installing pre-commit hooks..."
 	@command -v pre-commit >/dev/null 2>&1 || { \
-		echo "❌ pre-commit 未安装"; \
+		echo "❌ pre-commit not installed"; \
 		echo ""; \
-		echo "安装方法:"; \
+		echo "Installation:"; \
 		echo "  brew install pre-commit"; \
-		echo "  或"; \
+		echo "  or"; \
 		echo "  pip install pre-commit"; \
 		exit 1; \
 	}
 	pre-commit install
 	pre-commit install --hook-type pre-push
-	@echo "✅ Git hooks 安装完成"
+	@echo "✅ Git hooks installed"
 	@echo ""
-	@echo "现在会在以下时机自动运行检查:"
-	@echo "  • commit 前: 格式化代码 + 类型检查"
-	@echo "  • push 前: 运行测试 + 构建检查"
+	@echo "Checks will now run automatically:"
+	@echo "  • Before commit: format code + type check"
+	@echo "  • Before push: run tests + build check"
 
-# 更新 pre-commit hooks
+# Update pre-commit hooks
 hooks-update:
-	@echo "🔄 更新 pre-commit hooks..."
+	@echo "🔄 Updating pre-commit hooks..."
 	pre-commit autoupdate
-	@echo "✅ Hooks 更新完成"
+	@echo "✅ Hooks updated"
 
-# 手动运行所有 hooks
+# Manually run all hooks
 hooks-run:
-	@echo "🪝 运行所有 pre-commit hooks..."
+	@echo "🪝 Running all pre-commit hooks..."
 	pre-commit run --all-files
 
-# 清理构建产物
+# Clean build artifacts
 clean:
-	@echo "🧹 清理构建产物..."
+	@echo "🧹 Cleaning build artifacts..."
 	rm -rf dist/
-	@echo "✅ 清理完成"
+	@echo "✅ Cleanup complete"
 
-# 深度清理（包括依赖）
+# Deep clean (including dependencies)
 dist-clean: clean
-	@echo "🧹 深度清理..."
+	@echo "🧹 Deep cleaning..."
 	rm -rf node_modules/
 	rm -f bun.lockb
-	@echo "✅ 深度清理完成"
+	@echo "✅ Deep cleanup complete"
 
-# 完整流程
+# Full workflow
 all: install lint test build
 	@echo ""
-	@echo "✅ 所有检查通过！"
+	@echo "✅ All checks passed!"
 	@echo ""
 	@ls -lh dist/index.js
 
-# CI 流程（用于 GitHub Actions）
+# CI workflow (for GitHub Actions)
 ci: typecheck test build
-	@echo "✅ CI 检查通过"
+	@echo "✅ CI checks passed"
 
-# 发布前检查
+# Pre-release checks
 pre-release: all
 	@echo ""
-	@echo "🚀 准备发布..."
-	@echo "📦 检查 dist 文件..."
-	@test -f dist/index.js || (echo "❌ dist/index.js 不存在" && exit 1)
-	@echo "✅ 准备就绪，可以发布！"
+	@echo "🚀 Preparing for release..."
+	@echo "📦 Checking dist files..."
+	@test -f dist/index.js || (echo "❌ dist/index.js not found" && exit 1)
+	@echo "✅ Ready to release!"
 	@echo ""
-	@echo "下一步:"
-	@echo "  git add ."
-	@echo "  git commit -m 'chore: prepare release'"
-	@echo "  git tag v1.0.0"
-	@echo "  git push origin main --tags"
+	@echo "Next steps:"
+	@echo "  make release v1.0.0"
+
+release:  ## Create and push version tag (Usage: make release v1.0.0)
+	@if [ -z "$(filter-out release,$(MAKECMDGOALS))" ]; then \
+		echo "$(RED)Error: Version number required$(NC)"; \
+		echo "$(YELLOW)Usage: make release v1.0.0$(NC)"; \
+		exit 1; \
+	fi
+	@VERSION="$(filter-out release,$(MAKECMDGOALS))"; \
+	if ! echo "$$VERSION" | grep -qE '^v[0-9]+\.[0-9]+\.[0-9]+$$'; then \
+		echo "$(RED)Error: Invalid version format '$$VERSION'$(NC)"; \
+		echo "$(YELLOW)Expected format: v1.0.0$(NC)"; \
+		exit 1; \
+	fi; \
+	if [ -n "$$(git status --porcelain)" ]; then \
+		echo "$(RED)Error: Working directory has uncommitted changes$(NC)"; \
+		echo "$(YELLOW)Please commit or stash your changes before releasing$(NC)"; \
+		exit 1; \
+	fi; \
+	echo "$(YELLOW)About to create and push tag $$VERSION$(NC)"; \
+	printf "$(YELLOW)Continue? [y/N] $(NC)"; \
+	read -r CONFIRM; \
+	if [ "$$CONFIRM" != "y" ] && [ "$$CONFIRM" != "Y" ]; then \
+		echo "$(YELLOW)Aborted$(NC)"; \
+		exit 1; \
+	fi; \
+	if git config user.signingkey >/dev/null 2>&1 && command -v gpg >/dev/null 2>&1; then \
+		echo "$(BLUE)Creating GPG signed tag $$VERSION...$(NC)"; \
+		if git tag -s $$VERSION -m "Release $$VERSION" 2>/dev/null; then \
+			echo "$(GREEN)✓ Signed tag $$VERSION created successfully (Verified ✓)$(NC)"; \
+		else \
+			echo "$(YELLOW)⚠ GPG signing failed, using regular tag...$(NC)"; \
+			git tag -a $$VERSION -m "Release $$VERSION"; \
+			echo "$(GREEN)✓ Tag $$VERSION created successfully$(NC)"; \
+		fi \
+	else \
+		echo "$(BLUE)Creating tag $$VERSION...$(NC)"; \
+		git tag -a $$VERSION -m "Release $$VERSION"; \
+		echo "$(GREEN)✓ Tag $$VERSION created successfully$(NC)"; \
+		echo "$(YELLOW)💡 Tip: Configure GPG key to show Verified badge on GitHub$(NC)"; \
+	fi; \
+	echo "$(BLUE)Pushing tag to remote repository...$(NC)"; \
+	git push origin $$VERSION; \
+	echo "$(GREEN)✓ Release $$VERSION completed$(NC)"
+
+# Allow version number as target
+v%:
+	@:
