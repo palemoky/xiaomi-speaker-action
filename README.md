@@ -35,7 +35,7 @@ jobs:
         if: always()
         uses: palemoky/xiaomi-speaker-action@v1
         with:
-          webhook_url: ${{ secrets.SPEAKER_WEBHOOK_URL }}
+          webhook_url: ${{ vars.SPEAKER_WEBHOOK_URL }}
           api_secret: ${{ secrets.XIAOMI_API_SECRET }}
           success_message: '✅ Build succeeded for ${{ github.repository }}'
           failure_message: '❌ Build failed for ${{ github.repository }}'
@@ -75,7 +75,7 @@ jobs:
   if: always()
   uses: palemoky/xiaomi-speaker-action@v1
   with:
-    webhook_url: ${{ secrets.SPEAKER_WEBHOOK_URL }}
+    webhook_url: ${{ vars.SPEAKER_WEBHOOK_URL }}
     success_message: 'Ship it! The code is live.'
     failure_message: 'Mayday! Mayday! Something went wrong. Please check.'
 ```
@@ -87,7 +87,7 @@ jobs:
   if: failure()
   uses: palemoky/xiaomi-speaker-action@v1
   with:
-    webhook_url: ${{ secrets.SPEAKER_WEBHOOK_URL }}
+    webhook_url: ${{ vars.SPEAKER_WEBHOOK_URL }}
     message: 'Mayday! Mayday! ${{ github.repository }} failed.'
 ```
 
@@ -97,7 +97,7 @@ jobs:
 - name: Notify with Metadata
   uses: palemoky/xiaomi-speaker-action@v1
   with:
-    webhook_url: ${{ secrets.SPEAKER_WEBHOOK_URL }}
+    webhook_url: ${{ vars.SPEAKER_WEBHOOK_URL }}
     message: 'Ship it! The code is live.'
     custom_payload: |
       {
@@ -121,7 +121,7 @@ jobs:
         if: always()
         uses: palemoky/xiaomi-speaker-action@v1
         with:
-          webhook_url: ${{ secrets.SPEAKER_WEBHOOK_URL }}
+          webhook_url: ${{ vars.SPEAKER_WEBHOOK_URL }}
           success_message: 'Ship it! The code is live.'
           failure_message: 'Mayday! Mayday! Something went wrong. Please check.'
 
@@ -136,7 +136,7 @@ jobs:
         if: always()
         uses: palemoky/xiaomi-speaker-action@v1
         with:
-          webhook_url: ${{ secrets.SPEAKER_WEBHOOK_URL }}
+          webhook_url: ${{ vars.SPEAKER_WEBHOOK_URL }}
           success_message: 'Ship it! The code is live.'
           failure_message: 'Mayday! Mayday! Something went wrong. Please check.'
 ```
@@ -147,7 +147,7 @@ jobs:
 - name: Notify with Custom Retry
   uses: palemoky/xiaomi-speaker-action@v1
   with:
-    webhook_url: ${{ secrets.SPEAKER_WEBHOOK_URL }}
+    webhook_url: ${{ vars.SPEAKER_WEBHOOK_URL }}
     message: '重要通知'
     max_retries: 3
     timeout: 15000
@@ -159,7 +159,7 @@ jobs:
 - name: Notify with CF Access
   uses: palemoky/xiaomi-speaker-action@v1
   with:
-    webhook_url: ${{ secrets.SPEAKER_WEBHOOK_URL }}
+    webhook_url: ${{ vars.SPEAKER_WEBHOOK_URL }}
     cf_client_id: ${{ secrets.CF_ACCESS_CLIENT_ID }}
     cf_client_secret: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
     success_message: 'Ship it! The code is live.'
@@ -241,7 +241,7 @@ Check the `status` output to determine if the notification was successful:
   id: notify
   uses: palemoky/xiaomi-speaker-action@v1
   with:
-    webhook_url: ${{ secrets.SPEAKER_WEBHOOK_URL }}
+    webhook_url: ${{ vars.SPEAKER_WEBHOOK_URL }}
     message: "Test"
 
 - name: Check Status

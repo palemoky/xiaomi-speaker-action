@@ -12,7 +12,7 @@ jobs:
       - name: Test Success Notification
         uses: palemoky/xiaomi-speaker-action@dev
         with:
-          webhook_url: ${{ secrets.SPEAKER_WEBHOOK_URL }}
+          webhook_url: ${{ vars.SPEAKER_WEBHOOK_URL }}
           api_secret: ${{ secrets.SPEAKER_API_SECRET }}
           cf_client_id: ${{ secrets.CF_ACCESS_CLIENT_ID }}
           cf_client_secret: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
@@ -28,7 +28,7 @@ jobs:
         if: always()
         uses: palemoky/xiaomi-speaker-action@dev
         with:
-          webhook_url: ${{ secrets.SPEAKER_WEBHOOK_URL }}
+          webhook_url: ${{ vars.SPEAKER_WEBHOOK_URL }}
           api_secret: ${{ secrets.SPEAKER_API_SECRET }}
           cf_client_id: ${{ secrets.CF_ACCESS_CLIENT_ID }}
           cf_client_secret: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
