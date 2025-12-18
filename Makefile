@@ -146,7 +146,7 @@ pre-release: all
 	@echo "✅ Ready to release!"
 	@echo ""
 	@echo "Next steps:"
-	@echo "  make release v1.0.0"
+	@echo "  make release v0.0.0"
 
 release:  ## Create and push version tag (Usage: make release v1.0.0)
 	@if [ -z "$(filter-out release,$(MAKECMDGOALS))" ]; then \
