@@ -10,7 +10,7 @@ Send voice notifications via Xiaomi Speaker from your GitHub Actions workflows. 
 
 - 🎯 **Smart Message Routing** - Different messages for success/failure scenarios
 - 🔄 **Auto Retry** - Exponential backoff retry mechanism (configurable)
-- 🔐 **Secure** - Optional API key authentication
+- 🔐 **Secure** - Multiple authentication options (API Secret, Cloudflare Access)
 - 📦 **Lightweight** - Zero runtime dependencies
 - 🎨 **Flexible** - Customizable metadata and payload
 - ⚡ **Fast** - Built with TypeScript + Bun
@@ -36,27 +36,31 @@ jobs:
         uses: palemoky/xiaomi-speaker-action@v1
         with:
           webhook_url: ${{ vars.SPEAKER_WEBHOOK_URL }}
-          api_secret: ${{ secrets.XIAOMI_API_SECRET }}
-          success_message: '✅ Build succeeded for ${{ github.repository }}'
-          failure_message: '❌ Build failed for ${{ github.repository }}'
+          api_secret: ${{ secrets.SPEAKER_API_SECRET }}
+          cf_client_id: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+          cf_client_secret: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+          message: 'Default message.'
+          success_message: 'Build succeeded for ${{ github.repository }}'
+          failure_message: 'Build failed for ${{ github.repository }}'
+          max_retries: 2
+          timeout: 10000
 ```
 
 ## 📋 Inputs
 
-| Input              | Required | Default             | Description                       |
-| ------------------ | -------- | ------------------- | --------------------------------- |
-| `webhook_url`      | ✅       | -                   | Xiaomi Speaker webhook URL        |
-| `api_secret`       | ❌       | -                   | API secret for authentication     |
-| `cf_client_id`     | ❌       | -                   | Cloudflare Access Client ID       |
-| `cf_client_secret` | ❌       | -                   | Cloudflare Access Client Secret   |
-| `message`          | ❌       | -                   | Default message (fallback)        |
-| `success_message`  | ❌       | -                   | Message for successful jobs       |
-| `failure_message`  | ❌       | -                   | Message for failed/cancelled jobs |
-| `job_status`       | ❌       | `${{ job.status }}` | Job status (auto-detected)        |
-| `custom_payload`   | ❌       | -                   | Custom JSON payload               |
-| `timeout`          | ❌       | `10000`             | Request timeout (ms)              |
-| `max_retries`      | ❌       | `2`                 | Maximum retry attempts            |
-| `include_owner`    | ❌       | `false`             | Include repo owner in metadata    |
+| Input              | Required | Default             | Description                                                                                                                                           |
+| ------------------ | -------- | ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `webhook_url`      | ✓        | -                   | Your Cloudflare Tunnel domain (e.g., `https://speaker.example.com`), **Do NOT include** the `/webhook/custom` path - the action adds it automatically |
+| `api_secret`       | ✓        | -                   | API secret for authentication                                                                                                                         |
+| `cf_client_id`     | ✕        | -                   | Cloudflare Access Client ID (recommended for CF layer protection)                                                                                     |
+| `cf_client_secret` | ✕        | -                   | Cloudflare Access Client Secret (recommended for CF layer protection)                                                                                 |
+| `message`          | ✕        | -                   | Default message (fallback)                                                                                                                            |
+| `success_message`  | ✕        | -                   | Message for successful jobs                                                                                                                           |
+| `failure_message`  | ✕        | -                   | Message for failed/cancelled jobs                                                                                                                     |
+| `job_status`       | ✕        | `${{ job.status }}` | Job status (auto-detected)                                                                                                                            |
+| `timeout`          | ✕        | `10000`             | Request timeout (ms)                                                                                                                                  |
+| `max_retries`      | ✕        | `2`                 | Maximum retry attempts                                                                                                                                |
+| `include_owner`    | ✕        | `false`             | Include repo owner in metadata                                                                                                                        |
 
 ## 📤 Outputs
 
@@ -65,106 +69,6 @@ jobs:
 | `status`       | Request status (`success` or `failed`) |
 | `response`     | API response body (JSON string)        |
 | `message_sent` | The actual message that was sent       |
-
-## 📖 Usage Examples
-
-### Basic: Success/Failure Messages
-
-```yaml
-- name: Notify
-  if: always()
-  uses: palemoky/xiaomi-speaker-action@v1
-  with:
-    webhook_url: ${{ vars.SPEAKER_WEBHOOK_URL }}
-    success_message: 'Ship it! The code is live.'
-    failure_message: 'Mayday! Mayday! Something went wrong. Please check.'
-```
-
-### Only Notify on Failure
-
-```yaml
-- name: Notify on Failure
-  if: failure()
-  uses: palemoky/xiaomi-speaker-action@v1
-  with:
-    webhook_url: ${{ vars.SPEAKER_WEBHOOK_URL }}
-    message: 'Mayday! Mayday! ${{ github.repository }} failed.'
-```
-
-### With Custom Payload
-
-```yaml
-- name: Notify with Metadata
-  uses: palemoky/xiaomi-speaker-action@v1
-  with:
-    webhook_url: ${{ vars.SPEAKER_WEBHOOK_URL }}
-    message: 'Ship it! The code is live.'
-    custom_payload: |
-      {
-        "environment": "production",
-        "version": "${{ github.ref_name }}",
-        "deployed_by": "${{ github.actor }}"
-      }
-```
-
-### Multiple Notification Points
-
-```yaml
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Run Tests
-        run: npm test
-
-      - name: Notify Test Result
-        if: always()
-        uses: palemoky/xiaomi-speaker-action@v1
-        with:
-          webhook_url: ${{ vars.SPEAKER_WEBHOOK_URL }}
-          success_message: 'Ship it! The code is live.'
-          failure_message: 'Mayday! Mayday! Something went wrong. Please check.'
-
-  deploy:
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-      - name: Deploy
-        run: ./deploy.sh
-
-      - name: Notify Deploy Result
-        if: always()
-        uses: palemoky/xiaomi-speaker-action@v1
-        with:
-          webhook_url: ${{ vars.SPEAKER_WEBHOOK_URL }}
-          success_message: 'Ship it! The code is live.'
-          failure_message: 'Mayday! Mayday! Something went wrong. Please check.'
-```
-
-### With Retry Configuration
-
-```yaml
-- name: Notify with Custom Retry
-  uses: palemoky/xiaomi-speaker-action@v1
-  with:
-    webhook_url: ${{ vars.SPEAKER_WEBHOOK_URL }}
-    message: '重要通知'
-    max_retries: 3
-    timeout: 15000
-```
-
-### With Cloudflare Access Authentication
-
-```yaml
-- name: Notify with CF Access
-  uses: palemoky/xiaomi-speaker-action@v1
-  with:
-    webhook_url: ${{ vars.SPEAKER_WEBHOOK_URL }}
-    cf_client_id: ${{ secrets.CF_ACCESS_CLIENT_ID }}
-    cf_client_secret: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
-    success_message: 'Ship it! The code is live.'
-    failure_message: 'Mayday! Mayday! Something went wrong. Please check.'
-```
 
 ## 🔧 Setup
 
@@ -182,121 +86,24 @@ docker run -d \
   palemoky/xiaomi-speaker:latest
 ```
 
-### 2. Configure GitHub Secrets
+### 2. Configure GitHub Variables and Secrets
 
-Add these secrets to your repository (Settings → Secrets → Actions):
+#### Variables (Settings → Secrets and variables → Actions → Variables tab)
 
 **Required:**
 
-- `SPEAKER_WEBHOOK_URL`: Your webhook URL (e.g., `https://your-domain.com`)
+- `SPEAKER_WEBHOOK_URL`: Your Cloudflare Tunnel domain (e.g., `https://speaker.example.com`)
 
-**Optional (for authentication):**
+#### Secrets (Settings → Secrets and variables → Actions → Secrets tab)
 
-- `XIAOMI_API_SECRET`: Your API secret
-- `CF_ACCESS_CLIENT_ID`: Cloudflare Access Client ID (if using CF Access)
-- `CF_ACCESS_CLIENT_SECRET`: Cloudflare Access Client Secret (if using CF Access)
+**Required:**
 
-### 3. Use in Workflow
+- `SPEAKER_API_SECRET`: Your API secret (prevents unauthorized access)
 
-Add the action to your workflow as shown in the examples above.
+**Optional (for Cloudflare Access):**
 
-## 📡 Payload Structure
-
-The action sends the following payload to your webhook:
-
-```json
-{
-  "message": "Your notification message",
-  "metadata": {
-    "repository": "repo-name",
-    "workflow": "CI"
-  },
-  "custom": {
-    "your": "custom fields"
-  }
-}
-```
-
-**Note**: Set `include_owner: true` to add `owner` field to metadata.
-
-## 🔄 Retry Mechanism
-
-The action automatically retries failed requests with exponential backoff:
-
-- **Attempt 1**: Immediate
-- **Attempt 2**: After 1 second
-- **Attempt 3**: After 2 seconds
-- **Attempt 4**: After 4 seconds
-
-Configure `max_retries` to adjust the number of retry attempts (default: 2).
-
-## ⚠️ Error Handling
-
-**Important**: Notification failures will NOT block your workflow. The action uses `core.warning` instead of `core.setFailed`, so your CI/CD pipeline continues even if the notification fails.
-
-Check the `status` output to determine if the notification was successful:
-
-```yaml
-- name: Notify
-  id: notify
-  uses: palemoky/xiaomi-speaker-action@v1
-  with:
-    webhook_url: ${{ vars.SPEAKER_WEBHOOK_URL }}
-    message: "Test"
-
-- name: Check Status
-  run: echo "Notification status: ${{ steps.notify.outputs.status }}"
-```
-
-## 🧪 Development
-
-```bash
-# Install dependencies
-bun install
-
-# Install pre-commit hooks (recommended)
-make hooks
-
-# Type check
-bun run typecheck
-
-# Run tests
-bun test
-
-# Build
-bun run build
-
-# Format code
-bun run format
-```
-
-### Pre-commit Hooks
-
-This project uses [pre-commit](https://pre-commit.com/) to ensure code quality:
-
-**On commit:**
-
-- Auto-format code with Prettier
-- Run TypeScript type checking
-- Check file syntax and common issues
-
-**On push:**
-
-- Run all tests
-- Verify build succeeds
-- Check dist/ is up-to-date
-
-Install hooks:
-
-```bash
-make hooks
-```
-
-See [docs/PRE_COMMIT.md](docs/PRE_COMMIT.md) for details.
-
-## 📄 License
-
-MIT License - see [LICENSE](LICENSE) for details.
+- `CF_ACCESS_CLIENT_ID`: Cloudflare Access Client ID
+- `CF_ACCESS_CLIENT_SECRET`: Cloudflare Access Client Secret
 
 ## 🔗 Related Projects
 

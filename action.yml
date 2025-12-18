@@ -13,7 +13,7 @@ inputs:
 
   api_secret:
     description: 'API secret for authentication (Speaker-API-Secret header)'
-    required: false
+    required: true
 
   cf_client_id:
     description: 'Cloudflare Access Client ID (CF-Access-Client-Id header)'
@@ -39,10 +39,6 @@ inputs:
     description: 'Current job status (success/failure/cancelled). Auto-detected if not provided'
     required: false
     default: ${{ job.status }}
-
-  custom_payload:
-    description: 'Custom JSON payload (will be placed in "custom" field)'
-    required: false
 
   timeout:
     description: 'Request timeout in milliseconds'

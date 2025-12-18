@@ -5,6 +5,7 @@ import type { ActionInputs } from './types';
 describe('resolveMessage', () => {
   const baseInputs: ActionInputs = {
     webhook_url: 'https://example.com',
+    api_secret: 'test-secret',
     job_status: 'success',
     timeout: 10000,
     max_retries: 2,
@@ -66,6 +67,7 @@ describe('resolveMessage', () => {
 describe('buildPayload', () => {
   const baseInputs: ActionInputs = {
     webhook_url: 'https://example.com',
+    api_secret: 'test-secret',
     job_status: 'success',
     timeout: 10000,
     max_retries: 2,
@@ -108,41 +110,6 @@ describe('buildPayload', () => {
         workflow: 'CI',
       },
     });
-  });
-
-  test('should add custom payload to custom field', () => {
-    const inputs: ActionInputs = {
-      ...baseInputs,
-      custom_payload: JSON.stringify({
-        environment: 'production',
-        version: '1.0.0',
-      }),
-    };
-
-    const payload = buildPayload('Test message', inputs, mockContext);
-
-    expect(payload).toEqual({
-      message: 'Test message',
-      metadata: {
-        repository: 'testrepo',
-        workflow: 'CI',
-      },
-      custom: {
-        environment: 'production',
-        version: '1.0.0',
-      },
-    });
-  });
-
-  test('should throw error for invalid custom_payload JSON', () => {
-    const inputs: ActionInputs = {
-      ...baseInputs,
-      custom_payload: 'invalid json',
-    };
-
-    expect(() => buildPayload('Test message', inputs, mockContext)).toThrow(
-      /Invalid custom_payload JSON/
-    );
   });
 });
 

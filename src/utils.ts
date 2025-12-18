@@ -47,18 +47,6 @@ export function buildPayload(
     basePayload.metadata!.owner = context.repo.owner;
   }
 
-  // Add custom payload to 'custom' field
-  if (inputs.custom_payload) {
-    try {
-      const customData = JSON.parse(inputs.custom_payload);
-      basePayload.custom = customData;
-    } catch (error) {
-      throw new Error(
-        `Invalid custom_payload JSON: ${error instanceof Error ? error.message : String(error)}`
-      );
-    }
-  }
-
   return basePayload;
 }
 
