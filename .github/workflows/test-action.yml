@@ -16,8 +16,8 @@ jobs:
           api_secret: ${{ secrets.SPEAKER_API_SECRET }}
           cf_client_id: ${{ secrets.CF_ACCESS_CLIENT_ID }}
           cf_client_secret: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
-          success_message: '✅ Congratulations! The action is working!'
-          failure_message: '❌ Mayday! Mayday! Something went wrong. Please check.'
+          success_message: 'Congratulations! The action is working!'
+          failure_message: 'Mayday! Mayday! Something went wrong. Please check.'
 
       - name: Simulate Failure
         run: exit 1
