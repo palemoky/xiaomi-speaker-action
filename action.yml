@@ -40,10 +40,6 @@ inputs:
     required: false
     default: ${{ job.status }}
 
-  custom_payload:
-    description: 'Custom JSON payload (will be placed in "custom" field)'
-    required: false
-
   timeout:
     description: 'Request timeout in milliseconds'
     required: false

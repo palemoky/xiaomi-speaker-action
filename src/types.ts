@@ -10,7 +10,6 @@ export interface ActionInputs {
   success_message?: string;
   failure_message?: string;
   job_status: 'success' | 'failure' | 'cancelled';
-  custom_payload?: string;
   timeout: number;
   max_retries: number;
   include_owner: boolean;
@@ -26,7 +25,6 @@ export interface WebhookPayload {
     repository: string; // Repository name
     workflow: string; // Workflow name
   };
-  custom?: Record<string, any>; // Custom user-defined fields
 }
 
 /**

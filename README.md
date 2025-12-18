@@ -58,7 +58,6 @@ jobs:
 | `success_message`  | ✕        | -                   | Message for successful jobs                                                                                                                           |
 | `failure_message`  | ✕        | -                   | Message for failed/cancelled jobs                                                                                                                     |
 | `job_status`       | ✕        | `${{ job.status }}` | Job status (auto-detected)                                                                                                                            |
-| `custom_payload`   | ✕        | -                   | Custom JSON payload                                                                                                                                   |
 | `timeout`          | ✕        | `10000`             | Request timeout (ms)                                                                                                                                  |
 | `max_retries`      | ✕        | `2`                 | Maximum retry attempts                                                                                                                                |
 | `include_owner`    | ✕        | `false`             | Include repo owner in metadata                                                                                                                        |

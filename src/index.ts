@@ -16,7 +16,6 @@ async function run(): Promise<void> {
       success_message: core.getInput('success_message') || undefined,
       failure_message: core.getInput('failure_message') || undefined,
       job_status: (core.getInput('job_status') as ActionInputs['job_status']) || 'success',
-      custom_payload: core.getInput('custom_payload') || undefined,
       timeout: parseInt(core.getInput('timeout') || '10000', 10),
       max_retries: parseInt(core.getInput('max_retries') || '2', 10),
       include_owner: core.getBooleanInput('include_owner'),
