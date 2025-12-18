@@ -10,6 +10,8 @@ async function run(): Promise<void> {
     const inputs: ActionInputs = {
       webhook_url: core.getInput('webhook_url', { required: true }),
       api_secret: core.getInput('api_secret') || undefined,
+      cf_client_id: core.getInput('cf_client_id') || undefined,
+      cf_client_secret: core.getInput('cf_client_secret') || undefined,
       message: core.getInput('message') || undefined,
       success_message: core.getInput('success_message') || undefined,
       failure_message: core.getInput('failure_message') || undefined,
@@ -31,10 +33,19 @@ async function run(): Promise<void> {
     core.debug(`Final payload: ${JSON.stringify(payload, null, 2)}`);
 
     // 4. Send notification with retry
-    const response = await sendNotification(inputs.webhook_url, payload, inputs.api_secret, {
-      maxRetries: inputs.max_retries,
-      timeout: inputs.timeout,
-    });
+    const response = await sendNotification(
+      inputs.webhook_url,
+      payload,
+      {
+        apiSecret: inputs.api_secret,
+        cfAccessClientId: inputs.cf_client_id,
+        cfAccessClientSecret: inputs.cf_client_secret,
+      },
+      {
+        maxRetries: inputs.max_retries,
+        timeout: inputs.timeout,
+      }
+    );
 
     // 5. Set outputs
     core.setOutput('status', 'success');

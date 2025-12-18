@@ -3,12 +3,21 @@ import type { WebhookPayload, ApiResponse, RetryConfig } from './types';
 import { sleep, getRetryDelay } from './utils';
 
 /**
+ * Authentication configuration
+ */
+export interface AuthConfig {
+  apiSecret?: string;
+  cfAccessClientId?: string;
+  cfAccessClientSecret?: string;
+}
+
+/**
  * Send notification to Xiaomi Speaker webhook with retry mechanism
  */
 export async function sendNotification(
   webhookUrl: string,
   payload: WebhookPayload,
-  apiSecret: string | undefined,
+  auth: AuthConfig,
   config: RetryConfig
 ): Promise<ApiResponse> {
   const url = `${webhookUrl.replace(/\/$/, '')}/webhook/custom`;
@@ -18,8 +27,17 @@ export async function sendNotification(
     'User-Agent': 'xiaomi-speaker-action/1.0',
   };
 
-  if (apiSecret) {
-    headers['X-API-Key'] = apiSecret;
+  // Add API secret if provided
+  if (auth.apiSecret) {
+    headers['Speaker-API-Secret'] = auth.apiSecret;
+  }
+
+  // Add Cloudflare Access headers if provided
+  if (auth.cfAccessClientId) {
+    headers['CF-Access-Client-Id'] = auth.cfAccessClientId;
+  }
+  if (auth.cfAccessClientSecret) {
+    headers['CF-Access-Client-Secret'] = auth.cfAccessClientSecret;
   }
 
   core.debug(`Sending request to: ${url}`);
