@@ -165,11 +165,20 @@ release:  ## Create and push version tag (Usage: make release v1.0.0)
 		echo "$(YELLOW)Please commit or stash your changes before releasing$(NC)"; \
 		exit 1; \
 	fi; \
+	SEMVER=$${VERSION#v}; \
+	echo "$(BLUE)Updating package.json version to $$SEMVER...$(NC)"; \
+	sed -i.bak "s/\"version\": \".*\"/\"version\": \"$$SEMVER\"/" package.json && rm package.json.bak; \
+	git add package.json; \
+	git commit -m "chore: bump version to $$VERSION"; \
+	echo "$(GREEN)✓ Version updated in package.json$(NC)"; \
 	echo "$(YELLOW)About to create and push tag $$VERSION$(NC)"; \
 	printf "$(YELLOW)Continue? [y/N] $(NC)"; \
 	read -r CONFIRM; \
 	if [ "$$CONFIRM" != "y" ] && [ "$$CONFIRM" != "Y" ]; then \
 		echo "$(YELLOW)Aborted$(NC)"; \
+		git reset --soft HEAD~1; \
+		git restore --staged package.json; \
+		git restore package.json; \
 		exit 1; \
 	fi; \
 	if git config user.signingkey >/dev/null 2>&1 && command -v gpg >/dev/null 2>&1; then \
@@ -187,7 +196,8 @@ release:  ## Create and push version tag (Usage: make release v1.0.0)
 		echo "$(GREEN)✓ Tag $$VERSION created successfully$(NC)"; \
 		echo "$(YELLOW)💡 Tip: Configure GPG key to show Verified badge on GitHub$(NC)"; \
 	fi; \
-	echo "$(BLUE)Pushing tag to remote repository...$(NC)"; \
+	echo "$(BLUE)Pushing changes and tag to remote repository...$(NC)"; \
+	git push origin main; \
 	git push origin $$VERSION; \
 	echo "$(GREEN)✓ Release $$VERSION completed$(NC)"
 

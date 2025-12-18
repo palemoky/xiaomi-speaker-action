@@ -66,5 +66,5 @@ outputs:
     description: 'The actual message that was sent'
 
 runs:
-  using: 'node20'
+  using: 'node24'
   main: 'dist/index.js'
