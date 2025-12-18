@@ -23,6 +23,9 @@
   ],
   "author": "palemoky",
   "license": "MIT",
+  "engines": {
+    "bun": ">=1.3.4"
+  },
   "dependencies": {
     "@actions/core": "^2.0.1",
     "@actions/github": "^6.0.1"
