@@ -160,25 +160,23 @@ release:  ## Create and push version tag (Usage: make release v1.0.0)
 		echo "$(YELLOW)Expected format: v1.0.0$(NC)"; \
 		exit 1; \
 	fi; \
+	SEMVER=$${VERSION#v}; \
+	CURRENT_VERSION=$$(grep -o '"version": "[^"]*"' package.json | cut -d'"' -f4); \
+	if [ "$$CURRENT_VERSION" != "$$SEMVER" ]; then \
+		echo "$(RED)Error: package.json version ($$CURRENT_VERSION) does not match tag version ($$SEMVER)$(NC)"; \
+		echo "$(YELLOW)Please update package.json version to $$SEMVER first$(NC)"; \
+		exit 1; \
+	fi; \
 	if [ -n "$$(git status --porcelain)" ]; then \
 		echo "$(RED)Error: Working directory has uncommitted changes$(NC)"; \
 		echo "$(YELLOW)Please commit or stash your changes before releasing$(NC)"; \
 		exit 1; \
 	fi; \
-	SEMVER=$${VERSION#v}; \
-	echo "$(BLUE)Updating package.json version to $$SEMVER...$(NC)"; \
-	sed -i.bak "s/\"version\": \".*\"/\"version\": \"$$SEMVER\"/" package.json && rm package.json.bak; \
-	git add package.json; \
-	git commit -m "chore: bump version to $$VERSION"; \
-	echo "$(GREEN)✓ Version updated in package.json$(NC)"; \
 	echo "$(YELLOW)About to create and push tag $$VERSION$(NC)"; \
 	printf "$(YELLOW)Continue? [y/N] $(NC)"; \
 	read -r CONFIRM; \
 	if [ "$$CONFIRM" != "y" ] && [ "$$CONFIRM" != "Y" ]; then \
 		echo "$(YELLOW)Aborted$(NC)"; \
-		git reset --soft HEAD~1; \
-		git restore --staged package.json; \
-		git restore package.json; \
 		exit 1; \
 	fi; \
 	if git config user.signingkey >/dev/null 2>&1 && command -v gpg >/dev/null 2>&1; then \
@@ -196,10 +194,14 @@ release:  ## Create and push version tag (Usage: make release v1.0.0)
 		echo "$(GREEN)✓ Tag $$VERSION created successfully$(NC)"; \
 		echo "$(YELLOW)💡 Tip: Configure GPG key to show Verified badge on GitHub$(NC)"; \
 	fi; \
-	echo "$(BLUE)Pushing changes and tag to remote repository...$(NC)"; \
-	git push origin main; \
+	echo "$(BLUE)Pushing tag to remote repository...$(NC)"; \
 	git push origin $$VERSION; \
-	echo "$(GREEN)✓ Release $$VERSION completed$(NC)"
+	MAJOR_VERSION=$$(echo $$VERSION | cut -d. -f1); \
+	echo "$(BLUE)Updating major version tag $$MAJOR_VERSION...$(NC)"; \
+	git tag -fa $$MAJOR_VERSION -m "Update $$MAJOR_VERSION to $$VERSION"; \
+	git push origin $$MAJOR_VERSION --force; \
+	echo "$(GREEN)✓ Release $$VERSION completed$(NC)"; \
+	echo "$(GREEN)✓ Major version tag $$MAJOR_VERSION updated$(NC)"
 
 # Allow version number as target
 v%:
