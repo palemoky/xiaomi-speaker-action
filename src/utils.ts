@@ -1,4 +1,6 @@
-import type { Context } from '@actions/github/lib/context';
+import { context } from '@actions/github';
+
+type ActionContext = typeof context;
 import type { ActionInputs, WebhookPayload } from './types';
 
 /**
@@ -32,7 +34,7 @@ export function resolveMessage(inputs: ActionInputs): string {
 export function buildPayload(
   message: string,
   inputs: ActionInputs,
-  context: Context
+  context: ActionContext
 ): WebhookPayload {
   const basePayload: WebhookPayload = {
     message,
